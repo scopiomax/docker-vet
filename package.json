@@ -1,0 +1,20 @@
+{
+	"name": "vet-app",
+	"version": "1.0.1",
+	"main": "index.js",
+	"repository": "git@github.com:scopiomax/docker-vet.git",
+	"author": "maxmaster <maxmaster82@gmail.com>",
+	"license": "MIT",
+	"scripts": {
+		"aws-login": "aws --region us-east-1 ecr get-login-password | docker login --username AWS --password-stdin 104939124827.dkr.ecr.us-east-1.amazonaws.com",
+		"build-docker": "docker-compose -f docker-compose.yml build",
+		"push-docker": "yarn aws-login && docker-compose -f docker-compose.yml push",
+		"build-and-push-app": "cross-env-shell VET_APP_VERSION=\"${npm_package_name}_${npm_package_version}\" NODE_OPTIONS=--max_old_space_size=8192 \"yarn build-docker && yarn push-docker && echo '📦   Image Released'\"",
+		"tag-image": "docker tag 104939124827.dkr.ecr.us-east-1.amazonaws.com/scopio/vet-app:${npm_package_version} registry.heroku.com/docker-vet/web",
+		"push-image": "docker push registry.heroku.com/docker-vet/web",
+		"deploy-app": "yarn tag-image && yarn push-image && heroku container:release web"
+	},
+	"dependencies": {
+		"cross-env": "^7.0.3"
+	}
+}
